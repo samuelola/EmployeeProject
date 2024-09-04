@@ -8,6 +8,8 @@ use App\Http\Resources\ProjectResource;
 use App\Library\Utilities;
 use App\Http\Requests\ProjectRequest;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Gate;
+use App\Models\Project;
 
 class ProjectController extends Controller
 {
@@ -61,8 +63,12 @@ class ProjectController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(ProjectRequest $request, string $id)
+    public function update(ProjectRequest $request, string $id,Project $project)
     {
+        if(Gate::denies('update',$project)){
+            return abort(403,'forbidden for this action');
+        };
+
         $find_project = Project::where('id',$id)->orderByDesc('created_at')->first();
         if (is_null($find_project)) {
             return Utilities::sendError('Project not found.');
@@ -78,6 +84,9 @@ class ProjectController extends Controller
      */
     public function destroy(Project $project)
     {
+        if(Gate::denies('delete',$project)){
+            return abort(403,'forbidden for this action');
+        };
         $project->delete();
         return Utilities::sendResponse('Deleted','Project Deleted successfully.');
     }

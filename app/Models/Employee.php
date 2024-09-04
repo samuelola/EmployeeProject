@@ -12,4 +12,8 @@ class Employee extends Model
 
     protected $fillable = ['project_id','name','email','position'];
     
+    public function Project(){
+
+        return $this->belongsTo(Project::class);
+    }
 }
