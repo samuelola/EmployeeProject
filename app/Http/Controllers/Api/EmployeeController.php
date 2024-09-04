@@ -8,6 +8,7 @@ use App\Http\Requests\EmployeeRequest;
 use App\Models\Employee;
 use App\Http\Resources\EmployeeResource;
 use App\Library\Utilities;
+use App\Jobs\ProcessEmployee;
 
 class EmployeeController extends Controller
 {
@@ -27,6 +28,7 @@ class EmployeeController extends Controller
      */
     public function store(EmployeeRequest $request)
     {
+
         $employee_data = $request->validated();
         $newEmployee = new Employee;
         $newEmployee->project_id = $employee_data['project_id'];
@@ -34,6 +36,7 @@ class EmployeeController extends Controller
         $newEmployee->email = $employee_data['email'];
         $newEmployee->position = $employee_data['position'];
         $newEmployee->save();
+        ProcessEmployee::dispatch($newEmployee);
         return Utilities::sendResponse(new EmployeeResource($newEmployee), 'Employee Data saved successfully.');
     }
 
